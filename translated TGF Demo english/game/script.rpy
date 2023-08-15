@@ -289,7 +289,7 @@ screen stats_screen:
                 text "Buttocks: [measure] cm"
                 $ measure = 50 + ((mass - 50) * 0.48) // 1
                 $ measure = int(measure)
-                text "Thigh: [measure] cm"
+                text "Thighs: [measure] cm"
                 $ measure = 34 + ((mass - 50) * 0.28) // 1
                 $ measure = int(measure)
                 text "Calves: [measure] cm"
@@ -298,9 +298,9 @@ screen stats_screen:
                 text "Biceps: [measure] cm"
                 $ measure = 20 + ((mass - 50) * 0.36) // 1
                 $ measure = int(measure)
-                text "Forearm: [measure] cm"
+                text "Forearms: [measure] cm"
             else:
-                text "I have no\n measure tape"
+                text "I need a measuring tape to measure myself. I should buy one..."
 screen chat_screen():
     frame:
         align(.5, .53)
@@ -312,10 +312,10 @@ screen chat_screen():
             draggable True
             scrollbars "vertical"
             vbox:
-                text "Anna: Hello, how are you?"
-                text "[name]: Hello, well, so-so. And what?"
-                text "Anna: Oh how. And blow to me! I will be glad to meet you!"
-                text "[name]: Great idea, I\'m on my way!"
+                text "Anna: Hey, is this [name]?"
+                text "[name]: Hello! Yes I'm [name], and I assume this is Anna?"
+                text "Anna: Yep, you got that right. It was great meeting you! We should totally hang out some time!"
+                text "[name]: That's a great idea! I'll let you know when I'm free so we can set something up!"
 ######################################
 #Мои скрины###########################
 ######################################
@@ -328,17 +328,17 @@ python early:
     def eat(spend, eat_fill, health, hours):
         global fill, fill_max, time, money, time
         if fill >= fill_max:
-            o = "I\'m already full"
+            o = "I\'m stuffed! I probably shouldn't eat anymore right now..."
         elif money < spend:
-            o = "I have no money"
+            o = "I can't buy this, I\'m broke."
         elif time - hours < 1:
-            o = "I don\'t have time to eat"
+            o = "It's too late in the day to eat. I should wait until morning."
         else:
             time -= hours
             if time <= 0:
-                o = "It\'s getting late, what\'s the food?"
+                o = "It's too late in the day to eat. I should wait until morning."
             else:
-                o = "Well ate!" 
+                o = "Yum, tasty and filling!" 
                 if fill >= fill_max:
                     fill = fill_max
                 else:
@@ -349,10 +349,10 @@ python early:
         return (fill, money, o, health)
     def spend_money(money, spend):
         if money < spend:
-            o = "I have no money"
+            o = "I can't buy this, I\'m broke."
             result = 0
         else:
-            o = "Ready!"
+            o = "Alright!"
             money -= spend
             result = 1
         return (o, money, result)
@@ -363,35 +363,42 @@ python early:
 
 label start:
 
-    Character('Disclaimer', color="#000") "All events are fictitious, all coincidences are random."
+    Character('Disclaimer', color="#000") "This is a work of fiction. Names, characters, business, events and incidents are the products of the author's imagination. Any resemblance to actual persons, living or dead, or actual events is purely coincidental."
 
     Character('Disclaimer', color="#000") "All characters are adults!"
     scene black #чёрный фон
 
-    "Are you really 18 years old?"
+    "Are you really 18 years or older?"
 
     menu:
         "Yes!":
             jump intro # переход в главное меню
 
-        "No!":
+        "No...":
             $ renpy.quit() # выход из игры
 
 label intro:
     show screen stats
     show screen time_text
-    $ name = renpy.input('What is the name of the main character?').strip()
+    $ name = renpy.input('What is the main character\'s name?').strip()
 
-    e "Who am I?"
+    e "Hello, world. Nice to see you again."
 
-    e "I\'m a girl who just turned 19"
+    e "I'm just your run-of-the-mill college girl."
 
-    e "I don\'t have any particular hobbies because I\'m obsessed with studying."
+    e "Well, maybe I'm not so average. I don't really have any hobbies, nor do I get out very often. I mostly just stay in my room and study."
 
-    e "My appearance may be cute and cuddly, but I\'m not that popular with guys because of my introversion."
+    e "It's kind of an obsession at this point. Sure, my grades are solid, but it has its downsides."
+    
+    e "I just turned 19. Suffice to say, my birthday was spent hitting the books. No real party to speak of."
 
-    e "If any area interests me, I\'m ready to plunge headlong"
-    e "Here is my room"
+    e "I think I'm decently cute and cuddly, but guys don't pay attention to me. Like I said, I don't get out much."
+
+    e "Something has to change."
+    
+    e "I guess I just need to find something that interests me and plunge headlong into it..."
+
+    e "Here's my room. Home sweet home."
     show bg room
 label home:
     stop sound
@@ -413,12 +420,13 @@ label .home:
         scene bg room
 label .home_menu:    
     menu home_menu:   
-        "look in the mirror":
-            e "This is how I look"
+        "Look in the mirror":
+            e "Let's see how I look."
             if mass <= 54:
+                e "There I am, plain ol' me."
                 show expression "gg1" as mc
             elif mass >= 55 and mass < 62:
-                e "I feel like I have muscles!"
+                e "I feel like I have real muscles!"
                 show expression "gg2" as mc
             elif mass >= 62 and mass < 68:
                 e "It seems my muscles are bigger than before!"
@@ -433,7 +441,7 @@ label .home_menu:
             jump home.home
         "Relax (1h)":
             if time <= 1:
-                e "It\'s getting late, gotta go to bed"
+                e "It\'s getting late, I should go to bed."
             else:
                 $ time -= 1
                 $ fill -= 1
@@ -443,41 +451,44 @@ label .home_menu:
                 if fill <= 0:
                     $ health -= 1
                 if health < 1:
-                    e "I died. End of the game"
+                    e "I died. I should've paid more attention to my health. Game over."
                     return
             jump home.home
         "Eat (1h)":
             menu eat_home_menu:
-                "Sandwich with turkey and cheese 1$":
-                    $ fill, money, answer, health = eat(1, 3, health, 1)
-                    e "[answer]"
+                "Sandwich with turkey and cheese, 1$":
+                    if fill < fill_max:
+                        $ fill, money, answer, health = eat(1, 3, health, 1)
+                        e "[answer]"
+                    else:
+                        e "I'm not hungry. No need to overeat."
                     jump eat_home_menu
-                "Fried chicken with rice and vegetables 2$" if mass >= 55:
+                "Fried chicken with rice and vegetables, 2$" if mass >= 55:
                     if fill < fill_max:
                         $ fill, money, answer, health = eat(2, 5, health, 1)
                         e "[answer]"                 
                     else:
-                        e "I am not hungry"
+                        e "I'm not hungry. No need to overeat."
                     jump eat_home_menu
-                "Lasagna 3$"  if mass >= 62:
+                "Lasagna, 3$"  if mass >= 62:
                     if fill < fill_max:
                         $fill, money, answer, health = eat(3, 7, health, 1)
                         e "[answer]"
                     else:
-                        e "I am not hungry"
+                        e "I'm not hungry. No need to overeat."
                     jump eat_home_menu
                 "Back":    
                     jump home.home
 
         "Sleep (8h)":
             if time <= 1:            
-                e "I slept and feel great"
+                e "Good night, world. I'll see you in the morning!"
                 if experience + 45 - mass >= 0:
                     $ mass += 1
                     $ experience = experience + 45 - mass + 1
                 if mass >= 68:
                     $ mass = 68
-                    'Demo version is finished. Please wait for the full version of the game'
+                    "That's the end of the Demo! Thank you for playing! Please wait for the full version of the game."
                 if exp_stam >= 5 + (stamina_base - 20):
                     $ stamina_base += 1
                     $ exp_stam_max = (stamina_base - 15)
@@ -494,7 +505,7 @@ label .home_menu:
                 if fill < 0:
                     $ health -= 1
                 if health <= 0:
-                    e "I died in my sleep"
+                    e "..or not. I died in my sleep. Game over."
                     return
                 if dds == True:
                     $ exp_stam += 16
@@ -509,17 +520,17 @@ label .home_menu:
                 if health > 20:
                     $ health = 20
             else:
-                e "Too early to sleep"
+                e "It's too early to sleep just yet. There's plenty of day left!"
             jump home.home
         "Webcam (1h)" if cam == True and mass >= 55 and wc_count == False:
             if time >= 2:
                 $ time -= 1
                 $ wc_count = True
                 $ money += (mass - 40) * 3
-                e "How... unusual"
+                e "How... unusual. Still, the money is too good to ignore..."
                 jump home.home
             else:
-                e "I don\'t have time for webcam today"
+                e "I don\'t have time to cam today."
                 jump home.home
         "Go outside":
             jump street
@@ -542,7 +553,7 @@ label .street:
                 $ gym_go = True
                 jump gym
             if time <= 1:
-                e "It\'s late, what rocking?"
+                e "It\'s late, I should head back home. I don't want to fall asleep mid-rep!"
                 jump street.street
         "Cafe":
             jump cafe
@@ -556,7 +567,7 @@ label .street:
             pause
             if stamina > 3 and time > 1 and fill > 3 + fill_level // 3:
                 if health <= 0:
-                    e "I died. Game over"
+                    e "I died. I should've paid more attention to my health. Game over."
                     return
                 #e "Хорошо позанималась!"
                 $ exp_stam += 1
@@ -570,7 +581,7 @@ label .street:
                 jump street.street
             if (fill <= 2 + fill_level // 3) and stamina > 3:
                 $ fill -= 2 + fill_level // 3
-                e "I worked out, but I\'m too hungry and I\'m dizzy"
+                e "I worked out, but now I\'m dizzy. I should eat something."
                 $ time -= 1
                 $ exp_stam += 1
                 $ stamina -= 4
@@ -581,11 +592,11 @@ label .street:
                     $ health -= 1
                     jump street.street
                 if health <= 0:
-                    e "I died. Game over"
+                    e "I died. I should've paid more attention to my health. Game over."
                     return
                 jump street.street
             else:
-                e "Gotta go home"
+                e "That was a nice jog. Time to head back."
                 jump street.street
         "Come back home":
             jump home
@@ -598,9 +609,9 @@ label .cafe():
     show icons
     if cafe_text == False:
         '''
-        The interior of the cafe combines stylish minimalism with a cozy atmosphere. Delicate pastel shades on the walls create calmness, and soft wooden furniture gives warmth and comfort. Huge windows fill the room with light.'''
+        The cafe is stylishly minimalist yet cozy. The delicate pastel shades on the walls, coupled with the homey and soft wooden furniture, create a comfortable and warm atmosphere. Huge windows flood the space with natural light.'''
         '''
-        Along the walls are cozy sofas and tables with soft chairs, ideal for relaxing and chatting. On the tables, floral arrangements and candles create a romantic atmosphere and add charm.'''
+        Along the walls are cozy sofas and tables with cushy chairs, ideal for relaxing and chatting. The floral arrangements and candles on the tables are also charming and romantic.'''
         $ cafe_text = True
     menu cafe_menu:           
         "Work (8h)" if clocks == 8:
@@ -610,29 +621,30 @@ label .cafe():
             if fill <= 0:
                 $ health -= 4
             if health <= 0:
-                e "I died. Game over"
+                e "I died. I should've paid more attention to my health. Game over."
                 return
+            e "Another shift spent making drinks and serving food."    
             jump cafe
-        "Cheesecake 4$":
+        "Cheesecake, 4$":
             $ fill, money, answer, health = eat(4, 3, health, 0)
             e "[answer]"
             jump cafe_menu
                 
-        "Roll with chicken 6$":
+        "Roll with chicken, 6$":
             $ fill, money, answer, health = eat(6, 5, health, 0)
             e "[answer]"
             jump cafe_menu
 
-        "Bolognese pasta 8$":
+        "Bolognese pasta, 8$":
             $ fill, money, answer, health = eat(8, 7, health, 0)
             e "[answer]"
             jump cafe_menu
 
-        "Double burger with fries $10":
+        "Double burger with fries, $10":
             $ fill, money, answer, health = eat(10, 9, health, 0)
             e "[answer]"
             jump cafe_menu
-        "Greek salad 6$":
+        "Greek salad, 6$":
             $ fill, money, answer, health = eat(6, 2, health + 1, 0)
             e "[answer]"
             jump cafe_menu
@@ -647,12 +659,12 @@ label gym():
         scene bg gym
         show icons
         menu gym_menu:         
-            "exercise":
+            "Exercise":
                 menu train_menu:
                     "Strength training (1h)":
                         if time > 1 and fill > 2 + fill_level // 3 and stamina > 3:
                             if health <= 0:
-                                e "I died. Game over"
+                                e "I died. I should've paid more attention to my health. Game over."
                                 return
                             #e "Тренировка была тяжёлой"  
                             $ time -= 1
@@ -672,7 +684,7 @@ label gym():
                             $ fill -= 2 + fill_level // 3
                             $ experience += 1
                             $ stamina -= 4
-                            e "I worked out, but I\'m too hungry and I\'m dizzy"
+                            e "I worked out, but now I\'m dizzy. I should eat something."
                             if gluttony == True:
                                 $ experience += 1
                                 $ fill -= 1
@@ -681,11 +693,11 @@ label gym():
                             jump train_menu
 
                         if health <= 0:
-                            e "I died. Game over"
+                            e "I died. I should've paid more attention to my health. Game over."
                             return
                             jump train_menu
                         else:
-                            e "Something is wrong with me. Gotta go home"
+                            e "I don't feel good. I should go home and take it easy."
                             jump train_menu
                     "Personal training, $20 (1h)":
                         $ answer, money, result = spend_money(money, 20)
@@ -693,7 +705,7 @@ label gym():
                             if time > 1 and fill > 2 + fill_level // 3 and stamina > 3:
 
                                 if health <= 0:
-                                    e "I died. Game over"
+                                    e "I died. I should've paid more attention to my health. Game over."
                                     return
                                 #e "Тренировка была тяжёлой"  
                                 $ time -= 1
@@ -711,7 +723,7 @@ label gym():
                                 $ fill -= 2 + fill_level // 3
                                 $ experience += 1
                                 $ stamina -= 4
-                                e "I worked out, but I\'m too hungry and I\'m dizzy"
+                                e "I worked out, but now I\'m dizzy. I should eat something."
                                 if gluttony == True:
                                     $ experience += 1
                                     $ fill -= 1
@@ -720,11 +732,11 @@ label gym():
                                 jump train_menu
 
                             if health <= 0:
-                                e "I died. Game over"
+                                e "I died. I should've paid more attention to my health. Game over."
                                 return
                                 jump train_menu
                             else:
-                                e "Something is wrong with me. Gotta go home"
+                                e "I don't feel good. I should go home and take it easy."
                                 jump train_menu
                         else:
                             e "[answer]"
@@ -732,7 +744,7 @@ label gym():
                     "Cardio (1h)":
                         if stamina > 3 and time > 1 and fill > 3 + fill_level // 3:
                             if health <= 0:
-                                e "I died. Game over"
+                                e "I died. I should've paid more attention to my health. Game over."
                                 return
                             #e "Хорошо позанималась!"
                             $ exp_stam += 1
@@ -746,7 +758,7 @@ label gym():
                         
                         if (fill <= 2 + fill_level // 3) and stamina > 3:
                             $ fill -= 2 + fill_level // 3
-                            e "I worked out, but I\'m too hungry and I\'m dizzy"
+                            e "I worked out, but now I\'m dizzy. I should eat something."
                             $ time -= 1
                             $ exp_stam += 1
                             $ stamina -= 4
@@ -757,23 +769,23 @@ label gym():
                                 $ health -= 1
                                 jump train_menu
                             if health <= 0:
-                                e "I died. Game over"
+                                e "I died. I should've paid more attention to my health. Game over"
                                 return
                             jump train_menu
                         else:
-                            e "Gotta go home"
+                            e "Time to head home."
                             jump gym_menu
-                    "Check strength indicators":
-                        e "I\'ll try to squat with a barbell"
+                    "Check strength maximums":
+                        e "Let's see how much I can squat."
                         $ result = int(40 + ((mass - 50) * 5.6) // 1)
                         e "[result] kg!"
-                        e "I\'ll try to lift the barbell lying down"
+                        e "Now let's see how much I can bench press."
                         $ result = int( 20 + ((mass - 50) * 4) // 1)
                         e "[result] kg!"
-                        e "I\'m trying to lift the bar for biceps"
+                        e "How about about I see how much I can bicep curl?"
                         $ result = int(30 + ((mass - 50) * 1.4) // 1)
                         e "[result] kg!"
-                        e "I\'ll try dynamometry"
+                        e "And now for my grip strength!"
                         $ result = int(40 + ((mass - 50) * 1.2) // 1)
                         e "[result] kg!"
                         jump gym_menu
@@ -781,7 +793,7 @@ label gym():
                         jump gym_menu
             "Relax (1h)":
                 if time <= 1:
-                    e "It\'s getting late, gotta go to bed"
+                    e "It\'s late, I should head back home."
                 else:
                     $ time -= 1
                     $ stamina += 2
@@ -791,7 +803,7 @@ label gym():
                     if fill <= 0:
                         $ health -= 1
                     if health < 1:
-                        e "I died. End of the game"
+                        e "I died. I should've paid more attention to my health. Game over."
                         return
                 jump gym_menu
             "Protein shake, $8":
@@ -809,7 +821,7 @@ label .health_plus:
         "Buy drugs":
             menu hp_preparates:
                 "Drive, 30$":
-                    "This is a transparent test tube with an orange luminous liquid."
+                    "There's a luminous orange liquid in this test tube."
                     $ answer, money, result = spend_money(money, 30)
                     e "[answer]"
                     if result == 1:
@@ -817,7 +829,7 @@ label .health_plus:
                         $ health -= 3
                     jump hp_preparates
                 "Adrenaline X, $50" if adrenalin == False:
-                    "This is a flask with a poisonous liquid"
+                    "The liquid in this flask seems potent but poisonous"
                     $ answer, money, result = spend_money(money, 30)
                     e "[answer]"
                     if result == 1:
@@ -826,14 +838,14 @@ label .health_plus:
                         $ adrenalin = True
                     jump hp_preparates
                 "Gluttony, $80" if gluttony == False:
-                    "It is a large white tablet that is difficult to swallow due to its size."
+                    "This white tablet is huge! It looks like it's difficult to swallow."
                     $ answer, money, result = spend_money(money, 80)
                     e "[answer]"
                     if result == 1:
                         $ gluttony = True
                     jump hp_preparates
-                "GCI (Growth cells injection), $100":
-                    "This is a syringe with a clear solution containing live growth cells."
+                "GCI (Growth Cells Injection), $100":
+                    "This syringe holds a clear solution containing live growth cells."
                     $ answer, money, result = spend_money(money, 100)
                     e "[answer]"
                     if result == 1:
@@ -842,7 +854,7 @@ label .health_plus:
                         $ fill -= 10
                     jump hp_preparates
                 "DDs+ (deep dreams), $100" if dds == False:
-                    "This is a round candy in a bright wrapper that tastes like chocolate."
+                    "This a round candy is neatly packaged in a bright wrapper. It supposedly tastes like chocolate."
                     $ answer, money, result = spend_money(money, 100)
                     e "[answer]"
                     if result == 1:
@@ -850,7 +862,7 @@ label .health_plus:
                     jump hp_preparates
                 "Back":
                     jump health_plus_menu
-        "Go through the procedure":
+        "Undergo a procedure":
             menu hp_procedures:
                 "Restore health, $100":
                     $ answer, money, result = spend_money(money, 100)
@@ -884,7 +896,7 @@ label .buy_cam():
         $ cam = True
         pause
         e "[answer]"
-        e "I bought a webcam. I hope I can make money with it."
+        e "I bought a webcam. Maybe I can make some money with it."
         return
     else:
         pause
@@ -903,7 +915,7 @@ label .buy_scales():
         $ scales = True
         pause
         e "[answer]" 
-        e "I bought scales. Now I can measure my weight."
+        e "I bought a scale. I can measure my weight now."
         return
     else:
         pause
@@ -922,7 +934,7 @@ label .buy_tape():
         $ tape = True
         pause
         e "[answer]" 
-        e "I bought a measuring tape. Now I can measure myself." 
+        e "I bought a measuring tape. I can measure myself now. That kind of goes without saying..." 
         return
     else:
         pause
